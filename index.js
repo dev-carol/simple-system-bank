@@ -20,11 +20,22 @@ function operation(){
             ]
         }
     ]).then((answer)=>{
-        const action =answer['action']
+        const action = answer['action']
       if(action === 'Criar Conta'){
         createAccount()
-        buildAccount()
+      }else if( action === 'Depositar' ){
+
+      } else if(action === 'Consultar Saldo'){
+
       }
+
+      else if(action === 'Saque'){
+        
+    }
+    else if(action === 'Sair'){
+        console.log(chalk.bgBlue.black('Obrigado por usar o nodeBank'));
+        process.exit()
+    }
     }).catch((err) => console.log(err))
 }
 
