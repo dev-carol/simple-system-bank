@@ -24,6 +24,7 @@ function operation(){
       if(action === 'Criar Conta'){
         createAccount()
       }else if( action === 'Depositar' ){
+        deposite()
 
       } else if(action === 'Consultar Saldo'){
 
@@ -75,4 +76,73 @@ function buildAccount(){
         console.log(chalk.green('Ebaa! Sua conta foi criada!'));
         operation()
     }).catch((err) => console.log(err))
+}
+
+
+function deposite(){
+    inquirer.prompt([
+        {
+            name:'accountName',
+            message: 'Qual o nome da sua conta?'
+        }
+    ])
+    .then((answer) =>{
+        const accountName = answer['accountName']
+
+        if(!checkAccount(accountName)){
+            return deposite()
+        }
+        inquirer.prompt([
+           {
+            name:'amount',
+            message: 'Quanto você deseja depositar?'
+           }
+        ]).then((answer)=>{
+            const amount = answer['amount']
+            addAmount(accountName, amount)
+            
+            operation()
+        }).catch((err) => console.log(err))
+    })
+    .catch((err) => console.log(err))
+}
+
+
+function checkAccount(accountName){
+    if(!fs.existsSync(`accounts/${accountName}.json`)){
+        console.log(chalk.bgRed.black('Sorry, essa conta não existe. Tente novamente!'));
+        return false
+    }
+    return true
+
+}
+
+function addAmount(accountName,amount){
+ 
+    const accountData = getAccount(accountName)
+    if(!amount){
+        console.log(chalk.bgRed.black('Ocorreu um erro, tente novamente mais tarde!'));
+        return deposite()
+    }
+
+
+    accountData.balance = parseFloat(amount) + parseFloat(accountData.balance)
+    fs.writeFileSync(
+        `accounts/${accountName}.json`,
+        JSON.stringify(accountData),
+        function(err){
+            console.log(err);
+        }
+    )
+   console.log(chalk.green(`Foi depositado o valor de R$${amount} na sua conta`));
+
+}
+
+
+function getAccount(accountName){
+    const accountJson = fs.readFileSync(`accounts/${accountName}.json`, {
+        encoding: 'utf-8',
+        flag:'r'
+    })
+    return JSON.parse(accountJson)
 }
